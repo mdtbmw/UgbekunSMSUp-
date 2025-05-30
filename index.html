@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ugbekun SMSUP+ Demo - Secure Cardano Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Basic styles for mobile nav visibility - will be enhanced in CSS file */
+        .mobile-nav { display: none; }
+        .sidebar-mobile-overlay { display: none; }
+
+        @media (max-width: 1024px) { /* lg breakpoint in Tailwind */
+            .mobile-nav { display: flex; }
+            .sidebar.open + .sidebar-mobile-overlay { display: block; }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="app" class="flex h-screen">
+
+        <div id="loginPage" class="login-page-container w-full h-full flex flex-col items-center justify-center p-4 sm:p-8">
+            <div class="login-card-glass p-6 sm:p-8 md:p-12 w-full max-w-md text-center">
+                <img src="https://ugbekun2.metaspaceconsult.com/uploads/app_image/logo-small.png" alt="Ugbekun Logo" class="mx-auto mb-6 sm:mb-8 h-14 sm:h-16" onerror="this.src='https://placehold.co/150x50/667eea/ffffff?text=Logo+Error&font=inter'">
+                <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-white" style="font-family: 'Lexend', sans-serif;">Welcome to Ugbekun!</h1>
+                <p class="text-gray-200 mb-6 sm:mb-8 text-sm sm:base">The Future of Education, Powered by Cardano.</p>
+                
+                <div class="mb-4">
+                    <label for="username" class="block text-xs sm:text-sm font-medium text-gray-200 text-left mb-1">Username / Email / DID</label>
+                    <input type="text" id="username" value="admin" class="w-full p-3 border login-input focus:outline-none" placeholder="e.g., admin or did:prism:..." autocomplete="username">
+                </div>
+                <div class="mb-3"> 
+                    <label for="password" class="block text-xs sm:text-sm font-medium text-gray-200 text-left mb-1">Password</label>
+                    <input type="password" id="password" value="password" class="w-full p-3 border login-input focus:outline-none" placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                <div class="text-right mb-4">
+                    <a href="#" id="forgotPasswordLink" class="text-xs sm:text-sm text-orange-300 hover:text-orange-200 hover:underline transition-colors duration-200">Forgot Password?</a>
+                </div>
+
+                <div class="mb-6">
+                    <label for="role" class="block text-xs sm:text-sm font-medium text-gray-200 text-left mb-1">Select Role</label>
+                    <select id="role" class="w-full p-3 border login-input bg-white bg-opacity-80 text-gray-700 focus:outline-none input-field">
+                        <option value="admin">Admin</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                        <option value="parent">Parent (View Only)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 sm:gap-4 mt-6">
+                    <button id="loginButton" class="w-full login-button-custom text-white font-bold py-3 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-opacity-75 btn">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login Securely
+                    </button>
+                    <button id="verifyRecordPublicButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg text-base transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-opacity-75 btn">
+                        <i class="fas fa-search mr-2"></i>Verify Student Record (Public)
+                    </button>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-500 border-opacity-20">
+                    <p class="text-xs text-gray-400 mb-2">Or connect with:</p>
+                    <div class="flex justify-center space-x-3">
+                        <button id="connectPrismButton" class="btn btn-outline border-gray-400 text-gray-300 hover:bg-gray-700 hover:text-white hover:border-gray-500 p-2 text-xs" title="Connect with Atala PRISM DID (Future)">
+                            <i class="fas fa-id-card mr-1.5"></i> PRISM DID
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboardArea" class="hidden flex-1 flex flex-col lg:flex-row overflow-hidden">
+            <aside id="sidebar" class="sidebar fixed lg:sticky top-0 h-screen flex-col p-4 z-20 lg:flex transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+                <div id="sidebarHeader" class="flex items-center justify-between w-full p-1 mb-4 border-b border-slate-200 dark:border-slate-700 pb-3">
+                    </div>
+
+                <nav id="sidebarNav" class="flex-grow space-y-1 overflow-y-auto pr-1">
+                    </nav>
+
+                <div class="pt-4 mt-auto border-t border-gray-200 dark:border-gray-700 space-y-2">
+                     <button id="connectWalletButton" class="w-full flex items-center justify-start space-x-3 sidebar-link p-3 rounded-md text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-700/50 hover:text-sky-700 dark:hover:text-sky-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-1 btn mb-2">
+                         <i class="fas fa-wallet fa-fw"></i>
+                         <span>Connect Wallet</span>
+                     </button>
+                     <a href="#" class="sidebar-link p-3 flex items-center space-x-3" data-page="helpTutorials">
+                          <i class="fas fa-question-circle fa-fw"></i><span>Help/Tutorials</span>
+                     </a>
+                     <a href="#" class="sidebar-link p-3 flex items-center space-x-3" data-page="support">
+                          <i class="fas fa-life-ring fa-fw"></i><span>Support</span>
+                     </a>
+                     <button id="logoutButton" class="w-full flex items-center justify-start space-x-3 sidebar-link p-3 rounded-md text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1 btn">
+                          <i class="fas fa-sign-out-alt fa-fw"></i>
+                          <span>Logout</span>
+                     </button>
+                </div>
+            </aside>
+            <div id="sidebarMobileOverlay" class="sidebar-mobile-overlay fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"></div>
+
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <header class="lg:hidden sticky top-0 bg-white dark:bg-slate-800 shadow-md p-4 z-10 flex items-center justify-between">
+                    <button id="hamburgerButton" class="text-slate-600 dark:text-slate-300 p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <img src="https://ugbekun2.metaspaceconsult.com/uploads/app_image/logo-small.png" alt="Ugbekun Logo" class="h-8" onerror="this.src='https://placehold.co/100x25/000000/ffffff?text=Logo&font=inter'">
+                    <div class="w-8"></div> </header>
+
+                <main id="mainContent" class="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 overflow-y-auto bg-slate-50 dark:bg-slate-900 pb-20 lg:pb-10"> 
+                    <div id="adminDashboardContent" class="hidden"></div>
+                    <div id="studentDashboardContent" class="hidden"></div>
+                    <div id="teacherDashboardContent" class="hidden"></div>
+                    <div id="parentDashboardContent" class="hidden"></div>
+                    <div id="adminCredentialsContent" class="hidden"></div>
+                    <div id="adminSchoolWalletContent" class="hidden"></div>
+                    <div id="adminApiDocsContent" class="hidden"></div>
+                    <div id="adminGovernanceContent" class="hidden"></div>
+                    <div id="adminAuditLogContent" class="hidden"></div>
+                    <div id="gamificationPageContent" class="hidden"></div>
+                    <div id="gamificationSettingsContent" class="hidden"></div>
+                    <div id="schoolStorePageContent" class="hidden"></div>
+                    <div id="teacherProfessionalDevelopmentPageContent" class="hidden"></div>
+                    <div id="libraryPageContent" class="hidden"></div>
+                    <div id="eventsPageContent" class="hidden"></div>
+                    <div id="attendancePageContent" class="hidden"></div>
+                    <div id="homeworkPageContent" class="hidden"></div>
+                    <div id="academicTimetablePageContent" class="hidden"></div>
+                    <div id="messagingPageContent" class="hidden"></div>
+                    <div id="academicSubjectsPageContent" class="hidden"></div>
+                    <div id="studentAccountingPageContent" class="hidden"></div>
+                    <div id="officeAccountingPageContent" class="hidden"></div>
+                    <div id="teacherStudentsPageContent" class="hidden"></div>
+                    <div id="adminStudentsPageContent" class="hidden"></div>
+                    <div id="teacherRewardsPageContent" class="hidden"></div>
+                    <div id="onlineExamPageContent" class="hidden"></div>
+                    <div id="liveClassRoomsPageContent" class="hidden"></div>
+                    <div id="attachmentsBookPageContent" class="hidden"></div>
+                    <div id="receptionPageContent" class="hidden"></div>
+                    <div id="admissionPageContent" class="hidden"></div>
+                    <div id="humanResourcePageContent" class="hidden"></div>
+                    <div id="cardManagementPageContent" class="hidden"></div>
+                    <div id="bulkCommsPageContent" class="hidden"></div>
+                    <div id="reportsPageContent" class="hidden"></div>
+                    <div id="frontendSettingsPageContent" class="hidden"></div>
+                    <div id="customDomainPageContent" class="hidden"></div>
+                    <div id="settingsPageContent" class="hidden"></div>
+                    <div id="helpTutorialsPageContent" class="hidden"></div>
+                    <div id="supportPageContent" class="hidden"></div>
+                    <div id="subscriptionManagementPageContent" class="hidden"></div>
+                    
+                    <div id="sendReceiveTokensContent" class="hidden"></div> <div id="ipfsUploadContent" class="hidden"></div> <div id="marloweContractCreationContent" class="hidden"></div> <div id="nftAnalyticsContent" class="hidden"></div> <div id="advancedSettingsContent" class="hidden"></div> </main>
+            </div>
+        </div>
+    </div>
+
+    <nav id="mobileNav" class="mobile-nav fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-top-lg p-2 justify-around items-center z-30 lg:hidden">
+        <a href="#" data-page-mobile="dashboard" class="mobile-nav-item flex flex-col items-center text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 text-xs p-1">
+            <i class="fas fa-tachometer-alt text-lg mb-0.5"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" data-page-mobile="messages" class="mobile-nav-item flex flex-col items-center text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 text-xs p-1">
+            <i class="fas fa-envelope text-lg mb-0.5"></i>
+            <span>Messages</span>
+        </a>
+        <a href="#" data-page-mobile="events" class="mobile-nav-item flex flex-col items-center text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 text-xs p-1">
+            <i class="fas fa-calendar-star text-lg mb-0.5"></i>
+            <span>Events</span>
+        </a>
+        <a href="#" data-page-mobile="profile" class="mobile-nav-item flex flex-col items-center text-slate-600 dark:text-slate-300 hover:text-sky-500 dark:hover:text-sky-400 text-xs p-1">
+            <i class="fas fa-user-circle text-lg mb-0.5"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <div id="modalsContainer"></div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 space-y-3 z-50 w-full max-w-sm sm:max-w-md"></div>
+
+    <button id="openChatbotButton" class="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg z-40 transition-all duration-300 transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-opacity-75">
+        <i class="fas fa-robot text-2xl"></i>
+    </button>
+
+    <div id="chatbotModal" class="fixed inset-0 z-50 flex items-end justify-end p-4 hidden">
+        <div class="chatbot-container bg-white dark:bg-slate-800 rounded-lg shadow-xl flex flex-col h-[80vh] max-h-[600px] w-full max-w-md">
+            <div class="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-700">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Ugbekun AI Assistant</h3>
+                <button id="closeChatbotButton" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="chatbotMessages" class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+                <div class="flex justify-start mb-2">
+                    <div class="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-gray-200 p-3 rounded-lg max-w-[80%]">
+                        Hello! I'm your Ugbekun AI Assistant. How can I help you today?
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 flex items-center">
+                <input type="text" id="chatbotInput" class="input-field flex-1 mr-2 p-2" placeholder="Ask me anything...">
+                <button id="sendChatbotMessage" class="btn btn-primary px-4 py-2">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>

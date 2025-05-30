@@ -1,0 +1,30 @@
+{
+  "name": "ugbekun-smsup",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",  "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@meshsdk/core": "^1.9.0-beta.46",
+    "@meshsdk/react": "^1.9.0-beta.46",
+    "chart.js": "^4.4.9",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "next": "15.3.2",
+    "react": "^19.0.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.2",
+    "tailwindcss": "^4"
+  }
+}
